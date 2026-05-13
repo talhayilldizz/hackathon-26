@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="tr" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvestWise | AI Finans Asistanı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Urbanist:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { 
+            --bg: #050505; --card: rgba(17,17,17,0.8); --txt: #fff; --border: rgba(255,255,255,0.1); 
+            --accent: #0d6efd; --danger: #ff4d4d; --glow: rgba(13,110,253,0.3);
+        }
+        [data-bs-theme="light"] { 
+            --bg: #f5f7f9; --card: rgba(255,255,255,0.9); --txt: #111; --border: #e2e8f0; 
+        }
+        
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--txt); transition: 0.3s; }
+        .brand-text { font-family: 'Urbanist', sans-serif; letter-spacing: -1px; }
+        
+        .navbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 15px 0; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .main-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        
+        .form-control { background: rgba(255,255,255,0.03); border: 2px solid var(--border); color: var(--txt); border-radius: 12px; padding: 12px; font-size: 0.95rem; }
+        [data-bs-theme="light"] .form-control { background: rgba(0,0,0,0.02); border-color: #ced4da; color: #111; }
+        .form-control:focus { border-color: var(--accent); background: transparent; box-shadow: 0 0 0 4px var(--glow); }
+        
+        .form-label { font-weight: 600; font-size: 0.8rem; letter-spacing: 0.5px; color: rgba(255,255,255,0.8); margin-bottom: 8px; text-transform: uppercase; }
+        [data-bs-theme="light"] .form-label { color: rgba(0,0,0,0.7); }
+        
+        .search-box-wrapper { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); transition: all 0.3s ease; }
+        .search-box-wrapper:focus-within { border-color: rgba(13, 110, 253, 0.5); box-shadow: 0 0 25px rgba(13, 110, 253, 0.15); background: rgba(255, 255, 255, 0.08); }
+        [data-bs-theme="light"] .search-box-wrapper { background: #ffffff; border-color: #ced4da; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+        [data-bs-theme="light"] .search-box-wrapper:focus-within { border-color: #0d6efd; box-shadow: 0 8px 25px rgba(13, 110, 253, 0.15); }
+        
+        .custom-search-input { background: transparent !important; border: none !important; color: var(--txt) !important; box-shadow: none !important; font-size: 1.05rem; }
+        .custom-search-input::-webkit-input-placeholder { color: rgba(255,255,255,0.4) !important; font-weight: 400; }
+        .custom-search-input::-moz-placeholder { color: rgba(255,255,255,0.4) !important; font-weight: 400; }
+        .custom-search-input::placeholder { color: rgba(255,255,255,0.4) !important; font-weight: 400; }
+        [data-bs-theme="light"] .custom-search-input::-webkit-input-placeholder { color: rgba(0,0,0,0.4) !important; }
+
+        .search-container { margin-top: 40px; }
+        
+        .offcanvas { background-color: var(--bg); color: var(--txt); border-left: 1px solid var(--border); }
+        .offcanvas-header { border-bottom: 1px solid var(--border); }
+        
+        .hover-card { transition: all 0.2s ease; border: 1px solid transparent; }
+        .hover-card:hover { background: rgba(255,255,255,0.05); border-color: var(--border); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        [data-bs-theme="light"] .hover-card:hover { background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-color: var(--accent); }
+        
+        .chat-bubble { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; width: 100%; }
+        
+        .ai-core-avatar { width: 48px; height: 48px; background: linear-gradient(135deg, #0d6efd 0%, #8a2be2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: white; flex-shrink: 0; box-shadow: 0 0 15px rgba(13,110,253,0.4); }
+        .user-avatar { width: 48px; height: 48px; background: rgba(255,255,255,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+        [data-bs-theme="light"] .user-avatar { background: rgba(0,0,0,0.08); }
+        
+        .fav-star { font-size: 1.5rem; color: #555; cursor: pointer; transition: all 0.2s ease; }
+        .fav-star:hover { color: #ffc107; transform: scale(1.1); }
+        .fav-star.active { color: #ffc107; text-shadow: 0 0 15px rgba(255,193,7,0.6); transform: scale(1.15); }
+
+        .budget-card { background: linear-gradient(135deg, #0d6efd 0%, #003d99 100%); color: white; border-radius: 20px; padding: 25px; border: none; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3 text-primary brand-text" href="/">
+            <i class="bi bi-cpu me-2"></i>InvestWise
+        </a>
+        
+        <div class="d-flex align-items-center gap-2">
+            <div id="themeSwitcher" style="cursor:pointer;" class="fs-4 text-primary me-2"><i class="bi bi-moon-stars-fill"></i></div>
+            
+            <button class="btn btn-outline-secondary rounded-pill d-flex align-items-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#historyOffcanvas">
+                <i class="bi bi-clock-history"></i> <span class="d-none d-sm-inline">Geçmiş</span>
+            </button>
+            <button class="btn btn-outline-warning rounded-pill d-flex align-items-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#favsOffcanvas">
+                <i class="bi bi-star"></i> <span class="d-none d-sm-inline">Favoriler</span>
+            </button>
+
+            <div class="dropdown">
+                <button class="btn btn-primary d-flex align-items-center gap-2 px-3 py-2 rounded-pill shadow-sm" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle fs-5"></i>
+                    <span class="fw-semibold d-none d-md-inline">{% if profil.isim %}{{ profil.isim }}{% else %}Kullanıcı{% endif %}</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2 mt-2" style="background: var(--card); backdrop-filter:blur(10px);">
+                    <li><a class="dropdown-item rounded-3" href="#" onclick="showTab('home')"><i class="bi bi-chat-left-dots me-2"></i>Yeni Analiz</a></li>
+                    <li><a class="dropdown-item rounded-3" href="#profile" onclick="showTab('profile')"><i class="bi bi-sliders me-2"></i>Profil</a></li>
+                    <li><hr class="dropdown-divider opacity-25"></li>
+                    <li><a class="dropdown-item text-danger rounded-3" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>Çıkış</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- GEÇMİŞ OFF CANVAS -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="historyOffcanvas">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title fw-bold brand-text"><i class="bi bi-clock-history me-2 text-primary"></i>Geçmiş Analizler</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-3">
+        {% if analizler|length == 0 %}
+            <p class="text-muted small text-center mt-5">Henüz bir analiz yapmadın.</p>
+        {% endif %}
+        
+        {% for analiz in analizler %}
+        <div class="main-card mb-3 p-3 shadow-sm hover-card" style="cursor: pointer;" onclick="window.location.href='/?view={{ analiz.id }}'">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="fw-bold m-0 text-primary">{{ analiz.baslik }}</h6>
+                    <small class="text-muted text-truncate d-block mb-2" style="max-width: 220px;">{{ analiz.urun_linki }}</small>
+                </div>
+                <a href="/analiz_sil/{{ analiz.id }}" class="text-danger opacity-50 text-decoration-none" onclick="event.stopPropagation(); return confirm('Siliyorsun?')">
+                    <i class="bi bi-trash fs-5"></i>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- FAVORİLER OFF CANVAS -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="favsOffcanvas">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title fw-bold brand-text"><i class="bi bi-star me-2 text-warning"></i>Favori Analizlerim</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-3">
+        {% set favs = analizler | selectattr('is_favorite', 'equalto', True) | list %}
+        {% if favs|length == 0 %}
+            <p class="text-muted small text-center mt-5">Henüz favori eklemedin.</p>
+        {% endif %}
+        
+        {% for analiz in favs %}
+        <div class="main-card mb-3 p-3 shadow-sm border border-warning border-opacity-25 hover-card" style="cursor: pointer;" onclick="window.location.href='/?view={{ analiz.id }}'">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="fw-bold m-0 text-warning">{{ analiz.baslik }}</h6>
+                    <small class="text-muted text-truncate d-block mb-2" style="max-width: 200px;">{{ analiz.urun_linki }}</small>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <a href="/analiz_sil/{{ analiz.id }}" class="text-danger opacity-50 text-decoration-none" onclick="event.stopPropagation(); return confirm('Bu favoriyi tamamen siliyorsun?')">
+                        <i class="bi bi-trash fs-5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="tab-content">
+        
+        <!-- ANA SAYFA SEKME -->
+        <div class="tab-pane fade show active" id="home">
+            <div class="row justify-content-center pt-2 search-container">
+                <div class="col-md-10 col-lg-8 text-center">
+                    <div class="mb-5">
+                        <h1 class="display-4 fw-bold mb-3 brand-text" style="letter-spacing: -1.5px;">
+                            Harcamalarını <span class="text-primary">Yapay Zeka</span> ile Yönet
+                        </h1>
+                        <p class="text-muted fs-5 px-lg-5 opacity-75">
+                            Almayı planladığın ürünün linkini gir; bütçene olan etkisini ve fiyat fırsatlarını saniyeler içinde analiz edelim.
+                        </p>
+                    </div>
+    
+                    <form action="/analiz" method="POST">
+                        <div class="search-box-wrapper p-2 rounded-pill d-flex align-items-center shadow-lg mx-auto">
+                            <!-- min-width eklenerek mobilde kırılma önlendi -->
+                            <input type="text" name="baslik" class="form-control custom-search-input py-2" placeholder="Ürün Adı (Örn: Macbook)" required style="border-right: 1px solid rgba(255,255,255,0.1) !important; border-radius: 0; padding-left: 20px; flex: 0 0 30%; min-width: 140px;">
+                            <input type="text" name="urun_linki" class="form-control custom-search-input flex-grow-1 py-2" placeholder="Ürün linkini buraya yapıştır..." required style="padding-left: 20px;">
+                            <button class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow"><i class="bi bi-send-fill me-2"></i>Analiz Et</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- AI ANALİZ SONUÇ EKRANI -->
+            {% if analizler %}
+            <div class="row justify-content-center mt-5 mb-5 pb-5">
+                <div class="col-md-10 col-lg-9">
+                    
+                    <div class="d-flex gap-3 justify-content-end mb-4 align-items-start">
+                        <div class="p-3 chat-bubble rounded-4 rounded-br-0 text-end" style="background: rgba(13,110,253,0.05); border: 1px solid rgba(13,110,253,0.1); width: auto; max-width: 80%;">
+                            Lütfen <strong>{{ analizler[0].baslik }}</strong> için finansal check-up yapar mısın? Link: <a href="{{ analizler[0].urun_linki }}" target="_blank" class="text-primary">{{ analizler[0].urun_linki[:40] }}...</a>
+                        </div>
+                        <div class="user-avatar"><i class="bi bi-person"></i></div>
+                    </div>
+
+                    <div class="d-flex gap-3 align-items-start">
+                        <div class="ai-core-avatar"><i class="bi bi-stars"></i></div>
+                        <div class="chat-bubble flex-grow-1 shadow-lg rounded-4 rounded-bl-0">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="fw-bold m-0 brand-text text-primary"><i class="bi bi-activity me-2"></i>InvestWise AI Analiz Raporu</h5>
+                                <i class="bi bi-star{% if analizler[0].is_favorite %}-fill active{% endif %} fav-star" onclick="toggleFavorite('{{ analizler[0].id }}', this)"></i>
+                            </div>
+                            
+                            <p class="fs-6 lh-lg mb-4">Merhaba Emir! <strong>{{ analizler[0].baslik }}</strong> için verdiğin linki taradım ve finansal profilinle karşılaştırdım. İşte özet raporun:</p>
+                            
+                            <div class="row g-3 mt-2 mb-2">
+                                <div class="col-md-4">
+                                    <div class="main-card p-3 border border-success border-opacity-20 bg-success bg-opacity-10 h-100">
+                                        <h6 class="fw-bold text-success m-0"><i class="bi bi-shield-check me-2"></i>Bütçe Etkisi</h6>
+                                        <small class="text-muted d-block mt-2">Aylık tasarruf hedefini sarsmıyor. Alım yapılabilir.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="main-card p-3 border border-primary border-opacity-20 bg-primary bg-opacity-10 h-100">
+                                        <h6 class="fw-bold text-primary m-0"><i class="bi bi-cash-coin me-2"></i>Fiyat Geçmişi</h6>
+                                        <small class="text-muted d-block mt-2">Ürün son 30 günün en uygun fiyat seviyesinde.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="main-card p-3 border border-warning border-opacity-20 bg-warning bg-opacity-10 h-100">
+                                        <h6 class="fw-bold text-warning m-0"><i class="bi bi-lightbulb me-2"></i>AI Tavsiyesi</h6>
+                                        <small class="text-muted d-block mt-2">Fiyat/Performans oranı çok yüksek. Fırsat kaçmaz.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- PROFİL SEKME -->
+        <div class="tab-pane fade" id="profile">
+            <div class="row g-4 pt-4 pb-5 mb-5 align-items-stretch">
+                <div class="col-md-4 text-center">
+                    <div class="main-card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center">
+                        <div class="user-avatar mx-auto mb-3 mt-2" style="width: 80px; height: 80px; background: rgba(13,110,253,0.1); border-radius: 50%;">
+                            <i class="bi bi-person fs-1 text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-1 brand-text">{% if profil.isim %}{{ profil.isim }} {{ profil.soyisim }}{% else %}Bilgi Yok{% endif %}</h4>
+                        <p class="text-muted small">{{ profil.email }}</p>
+                        <div class="budget-card text-start mt-auto w-100">
+                            <small class="opacity-75 fw-bold" style="font-size: 0.7rem;">KALAN BÜTÇE</small>
+                            <h2 class="fw-bold mb-0">₺{{ profil.gelir - profil.gider if profil else 0 }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="main-card shadow-lg h-100">
+                        <h5 class="fw-bold mb-4 brand-text"><i class="bi bi-sliders me-2 text-primary"></i>Profil Verilerini Güncelle</h5>
+                        <form action="/profil_guncelle" method="POST">
+                            <div class="row g-3">
+                                <div class="col-md-6"><label class="form-label">İSİM</label><input type="text" name="isim" class="form-control" value="{{ profil.isim }}"></div>
+                                <div class="col-md-6"><label class="form-label">SOYİSİM</label><input type="text" name="soyisim" class="form-control" value="{{ profil.soyisim }}"></div>
+                                <div class="col-md-12"><label class="form-label">E-POSTA</label><input type="email" name="email" class="form-control" value="{{ profil.email }}"></div>
+                                <div class="col-md-4"><label class="form-label text-success">GELİR</label><input type="number" name="gelir" class="form-control border-success border-opacity-25" value="{{ profil.gelir }}"></div>
+                                <div class="col-md-4"><label class="form-label text-danger">GİDER</label><input type="number" name="gider" class="form-control border-danger border-opacity-25" value="{{ profil.gider }}"></div>
+                                <div class="col-md-4"><label class="form-label text-info">HEDEF</label><input type="number" name="hedef" class="form-control border-info border-opacity-25" value="{{ profil.hedef }}"></div>
+                                <div class="col-md-12 mt-4"><button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-4 shadow">Bilgileri Kaydet</button></div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- TOAST BİLDİRİMİ -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+    <div id="favToast" class="toast align-items-center border-0 text-white" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body fw-bold">
+                <i id="toastIcon" class="bi bi-check-circle-fill me-2"></i> <span id="toastMessage">Favorilere eklendi!</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // --- SEKME YÖNETİMİ ---
+    function showTab(id) {
+        document.querySelectorAll('.tab-pane').forEach(t => t.classList.remove('show', 'active'));
+        document.getElementById(id).classList.add('show', 'active');
+        window.history.pushState(null, null, '#' + id);
+    }
+
+    // --- TEMA DEĞİŞTİRİCİ ---
+    const ts = document.getElementById('themeSwitcher');
+    const savedTheme = localStorage.getItem('investwise_theme') || 'dark';
+    document.documentElement.setAttribute('data-bs-theme', savedTheme);
+    ts.innerHTML = savedTheme === 'dark' ? '<i class="bi bi-moon-stars-fill"></i>' : '<i class="bi bi-sun-fill text-warning"></i>';
+
+    ts.onclick = () => {
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-bs-theme', newTheme);
+        localStorage.setItem('investwise_theme', newTheme);
+        ts.innerHTML = newTheme === 'dark' ? '<i class="bi bi-moon-stars-fill"></i>' : '<i class="bi bi-sun-fill text-warning"></i>';
+    };
+
+    // --- SAYFA YÜKLENDİĞİNDE URL KONTROLÜ ---
+    document.addEventListener("DOMContentLoaded", function() {
+        const hash = window.location.hash.substring(1);
+        if(hash === 'profile') { showTab('profile'); } 
+        else { showTab('home'); }
+    });
+
+    // --- FAVORİ SİSTEMİ (AJAX) ---
+    async function toggleFavorite(id, element) {
+        const isCurrentlyFav = element.classList.contains('active');
+        const newStatus = !isCurrentlyFav;
+        
+        if(newStatus) {
+            element.classList.replace('bi-star', 'bi-star-fill');
+            element.classList.add('active');
+            showToast("Harika! Analiz favorilere eklendi.", "bg-success", "bi-check-circle-fill");
+        } else {
+            element.classList.replace('bi-star-fill', 'bi-star');
+            element.classList.remove('active');
+            showToast("Analiz favorilerden çıkarıldı.", "bg-secondary", "bi-info-circle-fill");
+        }
+
+        try {
+            await fetch(`/api/favori_toggle/${id}/${newStatus}`, { method: 'POST' });
+        } catch (error) { console.error("Sunucu Hatası", error); }
+    }
+
+    // --- TOAST BİLDİRİM FONKSİYONU ---
+    function showToast(message, bgColorClass, iconClass) {
+        const toastEl = document.getElementById('favToast');
+        document.getElementById('toastMessage').innerText = message;
+        document.getElementById('toastIcon').className = `bi ${iconClass} me-2`;
+        
+        toastEl.className = `toast align-items-center border-0 text-white ${bgColorClass}`;
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    }
+</script>
+</body>
+</html>
