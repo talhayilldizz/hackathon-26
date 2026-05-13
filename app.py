@@ -44,7 +44,7 @@ def ana_sayfa():
     
     try:
         # Kullanıcı bütçe ve isim bilgilerini çek
-        profil_resp = supabase.table("profiles").select("*").eq("user_id", current_user_id).limit(1).execute()
+        profil_resp = supabase.table("profiles").select("*").eq("id", current_user_id).limit(1).execute()
         # Kayıt yoksa varsayılan boş şablonu kullan (Hata önleyici)
         profil_verisi = profil_resp.data[0] if profil_resp.data else {"isim": "", "soyisim": "", "gelir": 0, "gider": 0, "hedef": 0, "email": ""}
     except:
@@ -67,13 +67,17 @@ def auth_process():
     email = request.form.get('email')
     pw = request.form.get('password')
     action = request.form.get('action')
+
     try:
         if action == 'register':
             res = supabase.auth.sign_up({"email": email, "password": pw})
         else:
             res = supabase.auth.sign_in_with_password({"email": email, "password": pw})
+
         session['user'] = res.user.id
+        session['user_email'] = res.user.email
         return redirect(url_for('ana_sayfa'))
+    
     except Exception as e:
         # Hata mesajını URL üzerinden giriş sayfasına geri gönder
         return redirect(f"/login?error={urllib.parse.quote(str(e))}")
@@ -94,18 +98,25 @@ def analiz_yap():
     
     link = request.form.get('urun_linki')
     baslik = request.form.get('baslik')
+    tahmin_skoru = None
+    tahmin_sonucu = ""
+    gemini_yanit = ""
+
     
     data = {
-        "urun_linki": link,
+        "user_id": session.get("user"),
+        "urun_linki": link if link else "Link belirtilmedi",
         "baslik": baslik if baslik else "İsimsiz Ürün",
-        "durum": "Analiz Ediliyor...", # Burası ileride AI skoruna göre değişecek
-        "user_id": session['user'],
-        "is_favorite": False
+        "model_skoru": tahmin_skoru if tahmin_skoru is not None else 0.5,
+        "model_sonucu": tahmin_sonucu if tahmin_sonucu else "BELİRSİZ",
+        "gemini_ozet": gemini_yanit if gemini_yanit else "Yapay zeka analizi hazırlanıyor veya hata oluştu.",
+        "is_favorite": False,
+        "status": "completed" if (gemini_yanit or tahmin_skoru) else "failed"
     }
     try:
         supabase.table("analizler").insert(data).execute()
-    except:
-        pass
+    except Exception as e:
+        print("DB Yansımadı, Hata Şudur:", str(e))
     return redirect(url_for('ana_sayfa'))
 
 @app.route('/analiz_sil/<id>')
@@ -136,20 +147,31 @@ def api_favori_toggle(id, status):
 @app.route('/profil_guncelle', methods=['POST'])
 def profil_guncelle():
     """Kullanıcı bilgilerini ve bütçe verilerini Upsert yöntemiyle günceller."""
+
     if 'user' not in session: return redirect(url_for('login_page'))
     
+    try:
+        gelir = int(request.form.get('gelir') or 0)
+        gider = int(request.form.get('gider') or 0)
+        hedef = int(request.form.get('hedef') or 0)
+
+    except:
+        gelir, gider, hedef = 0, 0, 0
+
     data = {
-        "user_id": session['user'],
-        "isim": request.form.get('isim'),
-        "soyisim": request.form.get('soyisim'),
-        "email": request.form.get('email'),
-        "gelir": int(request.form.get('gelir') or 0),
-        "gider": int(request.form.get('gider') or 0),
-        "hedef": int(request.form.get('hedef') or 0)
+        "id" : session["user"],
+        "isim" : request.form.get("isim"),
+        "soyisim" : request.form.get("soyisim"),
+        "email" : session.get("user_email"),
+        "gelir" : gelir,
+        "gider" : gider,
+        "hedef" : hedef,
+        "updated_at" : "now()"
     }
+    
     try:
         # user_id çakışırsa güncelle, yoksa yeni kayıt aç
-        supabase.table("profiles").upsert(data, on_conflict="user_id").execute()
+        supabase.table("profiles").upsert(data, on_conflict="id").execute()
         return redirect(f"/#profile") 
     except Exception as e:
         return redirect(url_for('ana_sayfa'))
