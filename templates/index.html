@@ -262,10 +262,10 @@
                 <div class="col-12">
                     <div class="main-card shadow-lg border border-primary border-opacity-10">
                         <div class="d-flex align-items-center mb-2">
-                            <h5 class="fw-bold m-0 brand-text"><i class="bi bi-magic me-2 text-primary"></i>Yapay Zeka ile Otomatik Ekstre Analizi</h5>
+                            <h5 class="fw-bold m-0 brand-text"><i class="bi bi-magic me-2 text-primary"></i>Yapay Zeka ile Otomatik Gider Analizi</h5>
                             <span class="badge bg-primary bg-opacity-10 text-primary ms-3 rounded-pill px-3 py-2 small">Önerilen</span>
                         </div>
-                        <p class="text-muted small mb-4">Gelir ve giderlerinizi tek tek elinizle girmek istemiyor musunuz? Bankanızdan indirdiğiniz hesap hareketleri dökümünü (PDF) buraya yükleyin; yapay zekamız profilinizi anında otomatik güncellesin.</p>
+                        <p class="text-muted small mb-4">Aylık ortalama giderlerinizi bilmiyormusunuz? Bankanızdan indirdiğiniz hesap hareketleri dökümünü (PDF) buraya yükleyin; yapay zeka ortalama aylık giderinizi anında otomatik güncellesin.</p>
                         
                         <form action="/profil/pdf_yukle" method="POST" enctype="multipart/form-data">
                             <div class="p-5 text-center rounded-4 border border-2 border-dashed position-relative hover-card" 
@@ -411,6 +411,46 @@
             }
         });
     });
+
+    // HTML içindeki <script> bloğunun en altına ekle:
+
+// 1. PDF Formunu seçiyoruz
+const pdfForm = document.querySelector('form[action="/profil/pdf_yukle"]');
+
+pdfForm.addEventListener('submit', async function(e) {
+    e.preventDefault(); // Sayfanın yenilenip gitmesini engeller
+    
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    
+    // UI: Butonu "Analiz Ediliyor" moduna çek
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>AI Analiz Ediyor...';
+    submitBtn.disabled = true;
+
+    try {
+        const response = await fetch('/profil/pdf_yukle', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+
+        if (data.toplam_gelir !== undefined) {
+            // 2. Senin o yeşil ve kırmızı kutucukları (Inputları) bulup dolduruyoruz
+            //document.querySelector('input[name="gelir"]').value = data.toplam_gelir;
+            document.querySelector('input[name="gider"]').value = data.toplam_gider;
+
+            // 3. Sol taraftaki "KALAN BÜTÇE" kartındaki rakamı da güncelleyelim
+
+            showToast("AI ekstreni okudu ve bütçeni güncelledi!", "bg-success", "bi-magic");
+        }
+    } catch (error) {
+        showToast("Bir sorun oluştu!", "bg-danger", "bi-exclamation-octagon");
+    } finally {
+        submitBtn.innerHTML = '<i class="bi bi-lightning-charge-fill me-2 text-warning"></i>Ekstremi Oku ve Profili Güncelle';
+        submitBtn.disabled = false;
+    }
+});
 </script>
 </body>
 </html>
