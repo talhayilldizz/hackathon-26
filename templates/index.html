@@ -96,7 +96,6 @@
     </div>
 </nav>
 
-<!-- GEÇMİŞ OFF CANVAS -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="historyOffcanvas">
     <div class="offcanvas-header">
         <h5 class="offcanvas-title fw-bold brand-text"><i class="bi bi-clock-history me-2 text-primary"></i>Geçmiş Analizler</h5>
@@ -123,7 +122,6 @@
     </div>
 </div>
 
-<!-- FAVORİLER OFF CANVAS -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="favsOffcanvas">
     <div class="offcanvas-header">
         <h5 class="offcanvas-title fw-bold brand-text"><i class="bi bi-star me-2 text-warning"></i>Favori Analizlerim</h5>
@@ -156,7 +154,6 @@
 <div class="container mt-4">
     <div class="tab-content">
         
-        <!-- ANA SAYFA SEKME -->
         <div class="tab-pane fade show active" id="home">
             <div class="row justify-content-center pt-2 search-container">
                 <div class="col-md-10 col-lg-8 text-center">
@@ -171,7 +168,6 @@
     
                     <form action="/analiz" method="POST">
                         <div class="search-box-wrapper p-2 rounded-pill d-flex align-items-center shadow-lg mx-auto">
-                            <!-- min-width eklenerek mobilde kırılma önlendi -->
                             <input type="text" name="baslik" class="form-control custom-search-input py-2" placeholder="Ürün Adı (Örn: Macbook)" required style="border-right: 1px solid rgba(255,255,255,0.1) !important; border-radius: 0; padding-left: 20px; flex: 0 0 30%; min-width: 140px;">
                             <input type="text" name="urun_linki" class="form-control custom-search-input flex-grow-1 py-2" placeholder="Ürün linkini buraya yapıştır..." required style="padding-left: 20px;">
                             <button class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow"><i class="bi bi-send-fill me-2"></i>Analiz Et</button>
@@ -180,7 +176,6 @@
                 </div>
             </div>
 
-            <!-- AI ANALİZ SONUÇ EKRANI -->
             {% if analizler %}
             <div class="row justify-content-center mt-5 mb-5 pb-5">
                 <div class="col-md-10 col-lg-9">
@@ -230,9 +225,8 @@
             {% endif %}
         </div>
 
-        <!-- PROFİL SEKME -->
         <div class="tab-pane fade" id="profile">
-            <div class="row g-4 pt-4 pb-5 mb-5 align-items-stretch">
+            <div class="row g-4 pt-4 align-items-stretch">
                 <div class="col-md-4 text-center">
                     <div class="main-card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center">
                         <div class="user-avatar mx-auto mb-3 mt-2" style="width: 80px; height: 80px; background: rgba(13,110,253,0.1); border-radius: 50%;">
@@ -257,7 +251,45 @@
                                 <div class="col-md-4"><label class="form-label text-success">GELİR</label><input type="number" name="gelir" class="form-control border-success border-opacity-25" value="{{ profil.gelir }}"></div>
                                 <div class="col-md-4"><label class="form-label text-danger">GİDER</label><input type="number" name="gider" class="form-control border-danger border-opacity-25" value="{{ profil.gider }}"></div>
                                 <div class="col-md-4"><label class="form-label text-info">HEDEF</label><input type="number" name="hedef" class="form-control border-info border-opacity-25" value="{{ profil.hedef }}"></div>
-                                <div class="col-md-12 mt-4"><button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-4 shadow">Bilgileri Kaydet</button></div>
+                                <div class="col-md-12 mt-4"><button type="submit" id="profileSaveBtn" class="btn btn-secondary w-100 py-2 fw-bold rounded-4 shadow-sm opacity-75">Manuel Bilgileri Kaydet</button></div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mt-2 pb-5 mb-5">
+                <div class="col-12">
+                    <div class="main-card shadow-lg border border-primary border-opacity-10">
+                        <div class="d-flex align-items-center mb-2">
+                            <h5 class="fw-bold m-0 brand-text"><i class="bi bi-magic me-2 text-primary"></i>Yapay Zeka ile Otomatik Ekstre Analizi</h5>
+                            <span class="badge bg-primary bg-opacity-10 text-primary ms-3 rounded-pill px-3 py-2 small">Önerilen</span>
+                        </div>
+                        <p class="text-muted small mb-4">Gelir ve giderlerinizi tek tek elinizle girmek istemiyor musunuz? Bankanızdan indirdiğiniz hesap hareketleri dökümünü (PDF) buraya yükleyin; yapay zekamız profilinizi anında otomatik güncellesin.</p>
+                        
+                        <form action="/profil/pdf_yukle" method="POST" enctype="multipart/form-data">
+                            <div class="p-5 text-center rounded-4 border border-2 border-dashed position-relative hover-card" 
+                                 style="border-color: rgba(13,110,253,0.3) !important; background: rgba(13,110,253,0.02); transition: all 0.3s ease; cursor: pointer;">
+                                
+                                <input type="file" name="ekstre_pdf" accept=".pdf" class="position-absolute top-0 start-0 w-100 h-100 opacity-0" style="cursor: pointer;" id="pdfInput" onchange="handleFileSelect(this)">
+                                
+                                <div id="uploadPrompt">
+                                    <i class="bi bi-cloud-arrow-up-fill display-4 text-primary mb-3 d-block"></i>
+                                    <span class="fw-semibold d-block mb-1 fs-5">Hesap Özetinizi (PDF) Buraya Sürükleyin veya Tıklayın</span>
+                                    <span class="text-muted small">E-Devlet veya Bankacılık uygulamalarından indirilen resmi PDF ekstreleri desteklenir (Maks: 10MB)</span>
+                                </div>
+                                
+                                <div id="fileSelected" class="d-none">
+                                    <i class="bi bi-file-earmark-pdf-fill display-4 text-success mb-3 d-block"></i>
+                                    <span id="fileNameText" class="fw-bold d-block mb-1 text-success fs-5">ekstre_raporu.pdf</span>
+                                    <span class="text-muted small d-block mb-1">Dosya başarıyla algılandı. Değiştirmek için tekrar tıklayabilirsiniz.</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 text-end" id="submitButtonContainer" style="display: none;">
+                                <button type="submit" class="btn btn-primary px-5 py-3 fw-bold rounded-4 shadow-lg">
+                                    <i class="bi bi-lightning-charge-fill me-2 text-warning"></i>Ekstremi Oku ve Profili Güncelle
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -268,7 +300,6 @@
     </div>
 </div>
 
-<!-- TOAST BİLDİRİMİ -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
     <div id="favToast" class="toast align-items-center border-0 text-white" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
@@ -340,6 +371,46 @@
         const toast = new bootstrap.Toast(toastEl);
         toast.show();
     }
+
+    // --- PDF SEÇİLDİĞİNDE UI DEĞİŞTİRME FONKSİYONU ---
+    function handleFileSelect(input) {
+        const uploadPrompt = document.getElementById('uploadPrompt');
+        const fileSelected = document.getElementById('fileSelected');
+        const fileNameText = document.getElementById('fileNameText');
+        const submitBtnContainer = document.getElementById('submitButtonContainer');
+
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            
+            fileNameText.innerText = file.name;
+            uploadPrompt.classList.add('d-none');
+            fileSelected.classList.remove('d-none');
+            
+            submitBtnContainer.style.display = 'block';
+            
+            showToast("PDF başarıyla seçildi! Analizi başlatabilirsiniz.", "bg-primary", "bi-file-pdf");
+        } else {
+            uploadPrompt.classList.remove('d-none');
+            fileSelected.classList.add('d-none');
+            submitBtnContainer.style.display = 'none';
+        }
+    }
+    // --- PROFİL FORM DEĞİŞİKLİK KONTROLÜ ---
+    const profileInputs = document.querySelectorAll('#profile form input');
+    const profileSaveBtn = document.getElementById('profileSaveBtn');
+
+    profileInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            // Eğer kullanıcı bir şeyler yazdıysa veya sildiyse butonu mavi (primary) yap
+            if (profileSaveBtn.classList.contains('btn-secondary')) {
+                profileSaveBtn.classList.remove('btn-secondary', 'opacity-75');
+                profileSaveBtn.classList.add('btn-primary');
+                
+                // Küçük bir detay: Butona basılabileceğini hissettirmek için pulse (parlama) efekti verilebilir
+                profileSaveBtn.style.boxShadow = "0 0 15px var(--glow)";
+            }
+        });
+    });
 </script>
 </body>
 </html>

@@ -1,60 +1,61 @@
+import os
+# DİKKAT: Bu satır her şeyden önce gelmeli! Keras'a PyTorch kullanmasını söylüyoruz.
+os.environ["KERAS_BACKEND"] = "torch" 
+
 import torch
-import tensorflow as tf
 import pickle
 import numpy as np
 from src.model import SentimentANN
 
-# --- 1. AYARLAR (Eğitimdekiyle BİREBİR AYNI OLMALI) ---
+# BURADAKİ import tensorflow as tf SATIRINI TAMAMEN SİLDİĞİNDEN EMİN OL!
+
+# --- 1. AYARLAR ---
 VOCAB_SIZE = 30000
 MAX_LEN = 100
 EMBED_DIM = 128
 HIDDEN_DIM = 64
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# M4 Mac için en hızlı cihaz seçimi (mps varsa mps, yoksa cpu)
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 # --- 2. MODEL VE TOKENIZER'I YÜKLE ---
-# Tokenizer'ı yükle
 with open('models/tokenizer.pickle', 'rb') as handle:
     tokenizer = pickle.load(handle)
 
-# Modeli oluştur ve ağırlıkları yükle
 model = SentimentANN(VOCAB_SIZE, EMBED_DIM, HIDDEN_DIM).to(device)
 model.load_state_dict(torch.load('models/sentiment_model.pth', map_location=device))
-model.eval() # Test modu
+model.eval()
 
-print(f"Model ve Tokenizer başarıyla yüklendi. Cihaz: {device}")
+print(f"✅ Sistem Hazır! Cihaz: {device}")
 
 # --- 3. TAHMİN FONKSİYONU ---
 def predict_sentiment(text):
-    # Metni temizleme (İsteğe bağlı, eğitimdeki gibi yapılabilir)
     text = text.lower()
     
-    # Sayısal diziye çevir
+    # Kelimeleri sayılara çevir
     sequence = tokenizer.texts_to_sequences([text])
     
-    # Padding yap (Eğitimdeki uzunlukta)
-    padded = tf.keras.preprocessing.sequence.pad_sequences(
-        sequence, maxlen=MAX_LEN, padding='post', truncating='post'
-    )
+    # SAF PYTHON PADDING (TensorFlow gerektirmez)
+    seq = sequence[0] if len(sequence) > 0 and len(sequence[0]) > 0 else []
+    if len(seq) > MAX_LEN:
+        padded_seq = seq[:MAX_LEN]
+    else:
+        padded_seq = seq + [0] * (MAX_LEN - len(seq))
+    padded = [padded_seq]
     
-    # PyTorch Tensor'e çevir
     input_tensor = torch.tensor(padded, dtype=torch.long).to(device)
     
-    # Tahmin yap
     with torch.no_grad():
         output = model(input_tensor)
         score = output.item()
     
-    # Sonucu yorumla
     status = "POZİTİF" if score > 0.5 else "NEGATİF"
     return status, score
 
-# --- 4. TEST ALANI ---
 if __name__ == "__main__":
     while True:
         user_input = input("\nYorumunuzu yazın (Çıkmak için 'q' tuşuna basın): ")
         if user_input.lower() == 'q':
             break
-            
         label, confidence = predict_sentiment(user_input)
         print(f"Sonuç: {label} | Skor: {confidence:.4f}")
