@@ -3,6 +3,7 @@ import requests
 import re
 import time
 from playwright.async_api import async_playwright
+from services.model_service import ModelService
 
 class TrendyolBot:
     def __init__(self):
@@ -119,25 +120,4 @@ class TrendyolBot:
         
         return sonuc_sozlugu
 
-# --- KULLANIM ---
-async def main():
-    bot = TrendyolBot()
-    hedef_link = "https://www.trendyol.com/shopping-faster/1-adet-siyah-lastik-toka-esnek-kaliteli-bilek-lastik-unisex-toka-p-1116118055"
-    
-    # Botu calistir ve verileri al
-    veriler = await bot.analiz_et(hedef_link)
-    
-    # Sonuclari ekrana yazdir
-    print("\n" + "="*50)
-    print(f"URUN ADI: {veriler['urun_bilgisi']['urun_adi']}")
-    print(f"FIYAT: {veriler['urun_bilgisi']['fiyat']}")
-    print(f"TOPLAM YORUM: {veriler['toplam_yorum_sayisi']}")
-    print("="*50)
-    
-    # Verileri bir JSON dosyasına kaydetmek istersen:
-    # import json
-    # with open("sonuc.json", "w", encoding="utf-8") as f:
-    #     json.dump(veriler, f, ensure_ascii=False, indent=4)
 
-if __name__ == "__main__":
-    asyncio.run(main())

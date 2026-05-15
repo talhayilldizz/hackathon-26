@@ -1,5 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 from extensions import supabase
+from services.model_service import ModelService
+from services.trendyol_service import TrendyolBot
+from services.gemini_service import GeminiService
+import asyncio
+from dotenv import load_dotenv
+import os
 
 analysis_bp = Blueprint('analysis', __name__)
 
@@ -35,37 +41,63 @@ def ana_sayfa():
 
 
 
+
+load_dotenv()
+api_key = os.getenv("GEMINI_API_KEY")
+model_s = ModelService()
+gemini_s = GeminiService(api_key=api_key)
+bot = TrendyolBot()
+
 @analysis_bp.route('/analiz', methods=['POST'])
 def analiz_yap():
     """Yeni bir ürün analizi başlatır ve veritabanına kaydeder."""
     if 'user' not in session: return redirect(url_for('auth.login_page'))
     
-
+    current_user_id = session.get('user')
     link = request.form.get("urun_linki")
-    baslik = request.form.get("baslik")
-    tahmin_skoru = None
-    tahmin_sonucu = ""
-    gemini_yanit = ""
 
-    data = {
-        "user_id": session.get("user"),
-        "urun_linki": link if link else "Link belirtilmedi",
-        "baslik": baslik if baslik else "İsimsiz Ürün",
-        "model_skoru": tahmin_skoru if tahmin_skoru is not None else 0.5,
-        "model_sonucu": tahmin_sonucu if tahmin_sonucu else "BELİRSİZ",
-        "gemini_ozet": gemini_yanit if gemini_yanit else "Yapay zeka analizi hazırlanıyor veya hata oluştu.",
-        "is_favorite": False,
-        "status": "completed" if (gemini_yanit or tahmin_skoru) else "failed"
-    }
+    if not link:
+        return redirect(url_for('analysis.ana_sayfa'))
+    
 
     try:
+        bot_verisi = asyncio.run(bot.analiz_et(link))
+        model_analiz = model_s.toplu_analiz(bot_verisi["yorumlar"])
+        profil_resp = supabase.table("profiles").select("*").eq("id", current_user_id).limit(1).execute()
+        profil_data = profil_resp.data[0] if profil_resp.data else {}
+
+        finansal_baglam = f"Gelir: {profil_data.get('gelir', 0)} TL, Gider: {profil_data.get('gider', 0)} TL, Hedef: {profil_data.get('hedef', 0)} TL"
+
+        gemini_yanit = gemini_s.finansal_danismanlik_yap(
+            bot_verisi["urun_bilgisi"],
+            model_analiz,
+            finansal_baglam
+        )
+
+        data = {
+            "user_id" : current_user_id,
+            "urun_linki" : link,
+            "baslik" : request.form.get("baslik"),
+            "model_skoru" : model_analiz["oran"],
+            "model_sonucu" : model_analiz["durum"],
+            "gemini_ozet" : gemini_yanit,
+            "is_favorite":False,
+            "status": "completed" if (gemini_yanit or model_analiz["oran"]) else "failed"
+        }
+
         supabase.table("analizler").insert(data).execute()
+        print(f"✅ Analiz Başarıyla Tamamlandı: {data['baslik']}")
+        print(gemini_yanit)
+    
     except Exception as e:
-        print("Analiz Kayıt Hatası:", str(e))
+        print("❌ Analiz Hatası:", str(e))
+        
+    
     return redirect(url_for('analysis.ana_sayfa'))
 
+
 @analysis_bp.route('/analiz_sil/<id>')
-def analiz_sil(id): # ...o yüzden burada parantez içine 'id' yazmak ZORUNDAYIZ.
+def analiz_sil(id): 
     """Belirli bir analizi veritabanından siler."""
     if 'user' not in session: 
         return redirect(url_for('auth.login_page'))

@@ -12,4 +12,4 @@ app.register_blueprint(analysis_bp)
 app.register_blueprint(profile_bp)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5001,use_reloader=False)
