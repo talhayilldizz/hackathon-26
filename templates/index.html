@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InvestWise | AI Finans Asistanı</title>
+    <title>AlınırMı? | AI Finans Asistanı</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Urbanist:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -51,7 +51,7 @@
         
         .chat-bubble { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; width: 100%; }
         
-        .ai-core-avatar { width: 48px; height: 48px; background: linear-gradient(135deg, #0d6efd 0%, #8a2be2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: white; flex-shrink: 0; box-shadow: 0 0 15px rgba(13,110,253,0.4); }
+        .ai-core-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 15px rgba(13,110,253,0.4); }
         .user-avatar { width: 48px; height: 48px; background: rgba(255,255,255,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
         [data-bs-theme="light"] .user-avatar { background: rgba(0,0,0,0.08); }
         
@@ -66,8 +66,9 @@
 
 <nav class="navbar sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold fs-3 text-primary brand-text" href="/">
-            <i class="bi bi-cpu me-2"></i>InvestWise
+        <a class="navbar-brand fw-bold fs-3 text-primary brand-text d-flex align-items-center" href="/">
+            <img src="/static/logo.png" alt="Logo" style="height: 38px; border-radius: 8px; margin-right: 12px; filter: drop-shadow(0 0 10px rgba(13,110,253,0.4));">
+            <span class="d-none d-sm-inline">AlınırMı?</span>
         </a>
         
         <div class="d-flex align-items-center gap-2">
@@ -159,64 +160,69 @@
                 <div class="col-md-10 col-lg-8 text-center">
                     <div class="mb-5">
                         <h1 class="display-4 fw-bold mb-3 brand-text" style="letter-spacing: -1.5px;">
-                            Harcamalarını <span class="text-primary">Yapay Zeka</span> ile Yönet
+                            Almayı Düşündüğün Ürün <span class="text-primary">AlınırMı?</span>
                         </h1>
                         <p class="text-muted fs-5 px-lg-5 opacity-75">
-                            Almayı planladığın ürünün linkini gir; bütçene olan etkisini ve fiyat fırsatlarını saniyeler içinde analiz edelim.
+                            Almayı planladığın ürünün linkini gir; yapay zeka hem müşteri yorumlarını hem de bütçeni analiz edip sana net bir cevap versin.
                         </p>
                     </div>
     
-                    <form action="/analiz" method="POST">
+                    <form action="/analiz" method="POST" id="analizForm">
                         <div class="search-box-wrapper p-2 rounded-pill d-flex align-items-center shadow-lg mx-auto">
                             <input type="text" name="baslik" class="form-control custom-search-input py-2" placeholder="Ürün Adı (Örn: Macbook)" required style="border-right: 1px solid rgba(255,255,255,0.1) !important; border-radius: 0; padding-left: 20px; flex: 0 0 30%; min-width: 140px;">
                             <input type="text" name="urun_linki" class="form-control custom-search-input flex-grow-1 py-2" placeholder="Ürün linkini buraya yapıştır..." required style="padding-left: 20px;">
-                            <button class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow"><i class="bi bi-send-fill me-2"></i>Analiz Et</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow" id="analizBtn"><i class="bi bi-send-fill me-2"></i>Analiz Et</button>
                         </div>
                     </form>
                 </div>
             </div>
 
             {% if analizler %}
-            <div class="row justify-content-center mt-5 mb-5 pb-5">
+            <div class="row justify-content-center mt-5 mb-5 pb-5" id="aiResultArea" style="display: none;">
                 <div class="col-md-10 col-lg-9">
                     
                     <div class="d-flex gap-3 justify-content-end mb-4 align-items-start">
-                        <div class="p-3 chat-bubble rounded-4 rounded-br-0 text-end" style="background: rgba(13,110,253,0.05); border: 1px solid rgba(13,110,253,0.1); width: auto; max-width: 80%;">
-                            Lütfen <strong>{{ analizler[0].baslik }}</strong> için finansal check-up yapar mısın? Link: <a href="{{ analizler[0].urun_linki }}" target="_blank" class="text-primary">{{ analizler[0].urun_linki[:40] }}...</a>
+                        <div class="p-3 chat-bubble rounded-4 rounded-br-0 text-end shadow-sm" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); width: auto; max-width: 80%;">
+                            Lütfen <strong>{{ analizler[0].baslik }}</strong> alınır mı analiz eder misin?<br> 
+                            <a href="{{ analizler[0].urun_linki }}" target="_blank" class="text-primary small text-decoration-none mt-1 d-inline-block"><i class="bi bi-link-45deg"></i> Ürün Linkine Git</a>
                         </div>
-                        <div class="user-avatar"><i class="bi bi-person"></i></div>
+                        <div class="user-avatar border border-secondary border-opacity-25"><i class="bi bi-person"></i></div>
                     </div>
 
                     <div class="d-flex gap-3 align-items-start">
-                        <div class="ai-core-avatar"><i class="bi bi-stars"></i></div>
-                        <div class="chat-bubble flex-grow-1 shadow-lg rounded-4 rounded-bl-0">
+                        <div class="ai-core-avatar shadow-lg border border-primary border-opacity-50 p-1" style="background: var(--bg);">
+                            <img src="/static/logo.png" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                        </div>
+
+                        <div class="chat-bubble flex-grow-1 shadow-lg rounded-4 rounded-bl-0" style="border: 1px solid rgba(13,110,253,0.2); background: linear-gradient(180deg, rgba(13,110,253,0.03) 0%, rgba(0,0,0,0) 100%);">
+                            
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h5 class="fw-bold m-0 brand-text text-primary"><i class="bi bi-activity me-2"></i>InvestWise AI Analiz Raporu</h5>
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill"><i class="bi bi-robot me-1"></i> AI Analizi</span>
                                 <i class="bi bi-star{% if analizler[0].is_favorite %}-fill active{% endif %} fav-star" onclick="toggleFavorite('{{ analizler[0].id }}', this)"></i>
                             </div>
                             
-                            <p class="fs-6 lh-lg mb-4">Merhaba Emir! <strong>{{ analizler[0].baslik }}</strong> için verdiğin linki taradım ve finansal profilinle karşılaştırdım. İşte özet raporun:</p>
+                            <p class="fs-6 lh-lg mb-4 text-light" style="white-space: pre-wrap;">{% if analizler[0].gemini_ozet %}{{ analizler[0].gemini_ozet }}{% else %}Yapay zeka bu ürün için bir özet oluşturamadı.{% endif %}</p>
                             
-                            <div class="row g-3 mt-2 mb-2">
-                                <div class="col-md-4">
-                                    <div class="main-card p-3 border border-success border-opacity-20 bg-success bg-opacity-10 h-100">
-                                        <h6 class="fw-bold text-success m-0"><i class="bi bi-shield-check me-2"></i>Bütçe Etkisi</h6>
-                                        <small class="text-muted d-block mt-2">Aylık tasarruf hedefini sarsmıyor. Alım yapılabilir.</small>
+                            <div class="row g-3 mt-4 mb-2">
+                                <div class="col-md-6">
+                                    <div class="p-4 rounded-4 border border-info border-opacity-20 h-100 text-center position-relative overflow-hidden" style="background: rgba(13, 202, 240, 0.05);">
+                                        <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at top right, rgba(13,202,240,0.1), transparent 70%); pointer-events: none;"></div>
+                                        <h6 class="fw-bold text-info opacity-75 m-0 text-uppercase" style="letter-spacing: 1px;"><i class="bi bi-chat-heart me-2"></i>Müşteri Memnuniyeti</h6>
+                                        <h1 class="fw-bold text-info mt-3 mb-0 display-5">%{{ analizler[0].model_skoru }}</h1>
+                                        <small class="text-muted d-block mt-3 opacity-75">Gerçek kullanıcı yorumları duygu analizi</small>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="main-card p-3 border border-primary border-opacity-20 bg-primary bg-opacity-10 h-100">
-                                        <h6 class="fw-bold text-primary m-0"><i class="bi bi-cash-coin me-2"></i>Fiyat Geçmişi</h6>
-                                        <small class="text-muted d-block mt-2">Ürün son 30 günün en uygun fiyat seviyesinde.</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="main-card p-3 border border-warning border-opacity-20 bg-warning bg-opacity-10 h-100">
-                                        <h6 class="fw-bold text-warning m-0"><i class="bi bi-lightbulb me-2"></i>AI Tavsiyesi</h6>
-                                        <small class="text-muted d-block mt-2">Fiyat/Performans oranı çok yüksek. Fırsat kaçmaz.</small>
+                                <div class="col-md-6">
+                                    {% set bg_color = 'danger' if analizler[0].model_sonucu == 'UZAK DURUN' else ('success' if analizler[0].model_sonucu == 'YÜKSEK FIRSAT' else 'warning') %}
+                                    <div class="p-4 rounded-4 border border-{{ bg_color }} border-opacity-20 h-100 text-center position-relative overflow-hidden" style="background: rgba(var(--bs-{{ bg_color }}-rgb), 0.05);">
+                                        <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at top right, rgba(var(--bs-{{ bg_color }}-rgb),0.15), transparent 70%); pointer-events: none;"></div>
+                                        <h6 class="fw-bold text-{{ bg_color }} opacity-75 m-0 text-uppercase" style="letter-spacing: 1px;"><i class="bi bi-bag-check me-2"></i>Nihai Karar</h6>
+                                        <h1 class="fw-bold text-{{ bg_color }} mt-3 mb-0 display-5">{{ analizler[0].model_sonucu }}</h1>
+                                        <small class="text-muted d-block mt-3 opacity-75">Fiyat/Performans ve Duygu modeline göre</small>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
 
@@ -265,7 +271,7 @@
                             <h5 class="fw-bold m-0 brand-text"><i class="bi bi-magic me-2 text-primary"></i>Yapay Zeka ile Otomatik Gider Analizi</h5>
                             <span class="badge bg-primary bg-opacity-10 text-primary ms-3 rounded-pill px-3 py-2 small">Önerilen</span>
                         </div>
-                        <p class="text-muted small mb-4">Aylık ortalama giderlerinizi bilmiyormusunuz? Bankanızdan indirdiğiniz hesap hareketleri dökümünü (PDF) buraya yükleyin; yapay zeka ortalama aylık giderinizi anında otomatik güncellesin.</p>
+                        <p class="text-muted small mb-4">Aylık ortalama giderlerinizi bilmiyor musunuz? Bankanızdan indirdiğiniz hesap hareketleri dökümünü (PDF) buraya yükleyin; yapay zeka ortalama aylık giderinizi anında otomatik güncellesin.</p>
                         
                         <form action="/profil/pdf_yukle" method="POST" enctype="multipart/form-data">
                             <div class="p-5 text-center rounded-4 border border-2 border-dashed position-relative hover-card" 
@@ -313,16 +319,14 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // --- SEKME YÖNETİMİ ---
     function showTab(id) {
         document.querySelectorAll('.tab-pane').forEach(t => t.classList.remove('show', 'active'));
         document.getElementById(id).classList.add('show', 'active');
         window.history.pushState(null, null, '#' + id);
     }
 
-    // --- TEMA DEĞİŞTİRİCİ ---
     const ts = document.getElementById('themeSwitcher');
-    const savedTheme = localStorage.getItem('investwise_theme') || 'dark';
+    const savedTheme = localStorage.getItem('alinirmi_theme') || 'dark';
     document.documentElement.setAttribute('data-bs-theme', savedTheme);
     ts.innerHTML = savedTheme === 'dark' ? '<i class="bi bi-moon-stars-fill"></i>' : '<i class="bi bi-sun-fill text-warning"></i>';
 
@@ -330,18 +334,39 @@
         const currentTheme = document.documentElement.getAttribute('data-bs-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-bs-theme', newTheme);
-        localStorage.setItem('investwise_theme', newTheme);
+        localStorage.setItem('alinirmi_theme', newTheme);
         ts.innerHTML = newTheme === 'dark' ? '<i class="bi bi-moon-stars-fill"></i>' : '<i class="bi bi-sun-fill text-warning"></i>';
     };
 
-    // --- SAYFA YÜKLENDİĞİNDE URL KONTROLÜ ---
     document.addEventListener("DOMContentLoaded", function() {
         const hash = window.location.hash.substring(1);
         if(hash === 'profile') { showTab('profile'); } 
         else { showTab('home'); }
+
+        // --- YENİ EKLENEN: SOHBET KISMINI GİZLEME/GÖSTERME MANTIĞI ---
+        const resultArea = document.getElementById('aiResultArea');
+        if(resultArea) {
+            const urlParams = new URLSearchParams(window.location.search);
+            // URL'de "view" varsa (Geçmişten tıklandıysa) VEYA yeni arama yapıldıysa (sessionStorage kontrolü) sohbeti göster
+            if(urlParams.has('view') || sessionStorage.getItem('justSearched') === 'true') {
+                resultArea.style.display = 'flex'; 
+                sessionStorage.removeItem('justSearched'); // Sadece bir kere göstermek için hafızayı temizle
+            }
+        }
     });
 
-    // --- FAVORİ SİSTEMİ (AJAX) ---
+    // Arama butonuna basıldığında Javascript "justSearched" anahtarını hafızaya atar. 
+    // Sayfa yenilendiğinde üstteki kod bu anahtarı görüp sohbeti ortaya çıkarır.
+    const analizForm = document.getElementById('analizForm');
+    const analizBtn = document.getElementById('analizBtn');
+    if(analizForm && analizBtn) {
+        analizForm.addEventListener('submit', function() {
+            sessionStorage.setItem('justSearched', 'true');
+            analizBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Analiz Ediliyor...';
+            analizBtn.disabled = true;
+        });
+    }
+
     async function toggleFavorite(id, element) {
         const isCurrentlyFav = element.classList.contains('active');
         const newStatus = !isCurrentlyFav;
@@ -361,7 +386,6 @@
         } catch (error) { console.error("Sunucu Hatası", error); }
     }
 
-    // --- TOAST BİLDİRİM FONKSİYONU ---
     function showToast(message, bgColorClass, iconClass) {
         const toastEl = document.getElementById('favToast');
         document.getElementById('toastMessage').innerText = message;
@@ -372,7 +396,6 @@
         toast.show();
     }
 
-    // --- PDF SEÇİLDİĞİNDE UI DEĞİŞTİRME FONKSİYONU ---
     function handleFileSelect(input) {
         const uploadPrompt = document.getElementById('uploadPrompt');
         const fileSelected = document.getElementById('fileSelected');
@@ -395,62 +418,51 @@
             submitBtnContainer.style.display = 'none';
         }
     }
-    // --- PROFİL FORM DEĞİŞİKLİK KONTROLÜ ---
+    
     const profileInputs = document.querySelectorAll('#profile form input');
     const profileSaveBtn = document.getElementById('profileSaveBtn');
 
     profileInputs.forEach(input => {
         input.addEventListener('input', function() {
-            // Eğer kullanıcı bir şeyler yazdıysa veya sildiyse butonu mavi (primary) yap
             if (profileSaveBtn.classList.contains('btn-secondary')) {
                 profileSaveBtn.classList.remove('btn-secondary', 'opacity-75');
                 profileSaveBtn.classList.add('btn-primary');
-                
-                // Küçük bir detay: Butona basılabileceğini hissettirmek için pulse (parlama) efekti verilebilir
                 profileSaveBtn.style.boxShadow = "0 0 15px var(--glow)";
             }
         });
     });
 
-    // HTML içindeki <script> bloğunun en altına ekle:
+    const pdfForm = document.querySelector('form[action="/profil/pdf_yukle"]');
+    if(pdfForm) {
+        pdfForm.addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>AI Analiz Ediyor...';
+            submitBtn.disabled = true;
 
-// 1. PDF Formunu seçiyoruz
-const pdfForm = document.querySelector('form[action="/profil/pdf_yukle"]');
+            try {
+                const response = await fetch('/profil/pdf_yukle', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
 
-pdfForm.addEventListener('submit', async function(e) {
-    e.preventDefault(); // Sayfanın yenilenip gitmesini engeller
-    
-    const formData = new FormData(this);
-    const submitBtn = this.querySelector('button[type="submit"]');
-    
-    // UI: Butonu "Analiz Ediliyor" moduna çek
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>AI Analiz Ediyor...';
-    submitBtn.disabled = true;
-
-    try {
-        const response = await fetch('/profil/pdf_yukle', {
-            method: 'POST',
-            body: formData
+                if (data.toplam_gelir !== undefined || data.toplam_gider !== undefined) {
+                    if(data.toplam_gider) document.querySelector('input[name="gider"]').value = data.toplam_gider;
+                    showToast("AI ekstreni okudu ve bütçeni güncelledi!", "bg-success", "bi-magic");
+                }
+            } catch (error) {
+                showToast("Bir sorun oluştu!", "bg-danger", "bi-exclamation-octagon");
+            } finally {
+                submitBtn.innerHTML = '<i class="bi bi-lightning-charge-fill me-2 text-warning"></i>Ekstremi Oku ve Profili Güncelle';
+                submitBtn.disabled = false;
+            }
         });
-        
-        const data = await response.json();
-
-        if (data.toplam_gelir !== undefined) {
-            // 2. Senin o yeşil ve kırmızı kutucukları (Inputları) bulup dolduruyoruz
-            //document.querySelector('input[name="gelir"]').value = data.toplam_gelir;
-            document.querySelector('input[name="gider"]').value = data.toplam_gider;
-
-            // 3. Sol taraftaki "KALAN BÜTÇE" kartındaki rakamı da güncelleyelim
-
-            showToast("AI ekstreni okudu ve bütçeni güncelledi!", "bg-success", "bi-magic");
-        }
-    } catch (error) {
-        showToast("Bir sorun oluştu!", "bg-danger", "bi-exclamation-octagon");
-    } finally {
-        submitBtn.innerHTML = '<i class="bi bi-lightning-charge-fill me-2 text-warning"></i>Ekstremi Oku ve Profili Güncelle';
-        submitBtn.disabled = false;
     }
-});
 </script>
 </body>
 </html>

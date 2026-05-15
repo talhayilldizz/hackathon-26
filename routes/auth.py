@@ -13,7 +13,6 @@ def login_page():
 
 @auth_bp.route('/auth', methods=["POST"])
 def auth_process():
-    """Kayıt ve giriş işlemlerini Supabase Auth üzerinden yönetir."""
     email = request.form.get('email')
     pw = request.form.get('password')
     action = request.form.get('action')
@@ -21,12 +20,16 @@ def auth_process():
     try:
         if action == 'register':
             res = supabase.auth.sign_up({"email": email, "password": pw})
+            
+            return redirect(url_for('auth.login_page', msg="Kayıt başarılı! Lütfen şimdi giriş yapın."))
+            
         else:
             res = supabase.auth.sign_in_with_password({"email": email, "password": pw})
-        
-        session['user'] = res.user.id
-        session['user_email'] = res.user.email
-        return redirect(url_for('analysis.ana_sayfa'))
+            
+            session['user'] = res.user.id
+            session['user_email'] = res.user.email
+            return redirect(url_for('analysis.ana_sayfa'))
+            
     except Exception as e:
         return redirect(f"/login?error={urllib.parse.quote(str(e))}")
     

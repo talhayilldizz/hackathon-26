@@ -14,7 +14,7 @@ class GeminiService:
         
         # PROMPT STRATEJİSİ: Kişisel veriyi "gizli" kullanarak tavsiye verdiriyoruz.
         prompt = f"""
-        Sen InvestWise adlı bir finansal asistan ve akıllı alışveriş danışmanısın.
+        Sen "AlınırMı?" adlı bir finansal asistan ve akıllı alışveriş danışmanısın.
         
         GİRDİLER:
         - Ürün: {urun_verisi['urun_adi']}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InvestWise | Giriş Yap</title>
+    <title>AlınırMı? | Giriş Yap</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Urbanist:wght@800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -17,7 +17,7 @@
             background: rgba(17, 17, 17, 0.8); 
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border); border-radius: 32px; 
-            padding: 50px; width: 100%; max-width: 440px; 
+            padding: 40px 50px; width: 100%; max-width: 440px; 
             box-shadow: 0 25px 80px rgba(0,0,0,0.6); 
         }
 
@@ -45,7 +45,8 @@
             animation: float 6s ease-in-out infinite;
         }
 
-        .ai-core i { font-size: 100px; color: var(--accent); filter: drop-shadow(0 0 20px var(--accent)); }
+        /* Eski ikon styling'ini kaldırdık */
+        /* .ai-core i { ... } */
 
         @keyframes float { 0%, 100% { transform: translateY(0) scale(1); opacity: 0.8; } 50% { transform: translateY(-20px) scale(1.1); opacity: 1; } }
 
@@ -69,13 +70,19 @@
         
         <div class="col-lg-6 d-flex align-items-center justify-content-center p-4">
             <div class="auth-card">
-                <div class="text-center mb-5">
-                    <h1 class="display-5 fw-bold text-primary brand-font mb-2" id="authTitle">Giriş Yap</h1>
-                    <p class="text-muted small">Finansal kararlarında AI gücünü hisset.</p>
+                <div class="text-center mb-4">
+                    <img src="/static/logo.png" alt="AlınırMı Logo" style="max-width: 240px; margin-bottom: 10px; filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.5));">
+                    
+                    <h1 class="display-6 fw-bold text-primary brand-font mb-2 mt-3" id="authTitle">Giriş Yap</h1>
+                    <p class="text-muted small">Alışveriş kararlarında AI gücünü hisset.</p>
                 </div>
 
                 <div id="errorBox" class="error-alert text-center fw-medium">
                     <i class="bi bi-exclamation-circle me-2"></i> <span id="errorMsg"></span>
+                </div>
+                
+                <div id="successBox" class="text-center fw-medium" style="display: none; background: rgba(40, 167, 69, 0.1); border: 1px solid rgba(40, 167, 69, 0.2); color: #28a745; border-radius: 12px; padding: 12px; font-size: 0.85rem; margin-bottom: 20px; animation: fadeIn 0.3s;">
+                    <i class="bi bi-check-circle-fill me-2"></i> <span id="successMsg"></span>
                 </div>
                 
                 <form id="authForm" action="/auth" method="POST" onsubmit="return validateForm()">
@@ -109,13 +116,13 @@
             <div class="mesh-bg"></div>
             <div class="text-center" style="z-index: 2;">
                 <div class="ai-core mb-5">
-                    <i class="bi bi-cpu-fill"></i>
+                    <img src="/static/logo.png" alt="AlınırMı Logo" style="max-width: 280px; filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.5));">
                 </div>
                 <h2 class="display-4 fw-bold brand-font px-5">
-                    Geleceğin Finansal<br>
-                    <span class="text-primary">Mimarisi Burada.</span>
+                    Geleceğin Alışveriş<br>
+                    <span class="text-primary">Asistanı Burada.</span>
                 </h2>
-                <p class="text-muted fs-5 mt-3 opacity-75">InvestWise ile bütçeni kontrol altına al.</p>
+                <p class="text-muted fs-5 mt-3 opacity-75">AlınırMı? ile paran cebinde, aklın rahat kalsın.</p>
             </div>
         </div>
         
@@ -135,7 +142,6 @@
     const submitBtn = document.getElementById('submitBtn');
 
     function toggleAuthMode() {
-        // Hata kutusunu sıfırla
         errorBox.style.display = 'none';
         
         if (action.value === 'login') {
@@ -151,44 +157,45 @@
         }
     }
 
-    // --- FORM DOĞRULAMA (VALIDATION) ---
     function validateForm() {
         const email = emailInput.value.trim();
         const password = passwordInput.value;
         
-        // 1. E-Posta Format Kontrolü
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             showError("Lütfen geçerli bir e-posta adresi girin.");
             return false;
         }
 
-        // 2. Şifre Güvenlik Kontrolü (Sadece Kayıt Olurken)
         if (action.value === 'register' && password.length < 6) {
             showError("Şifreniz en az 6 karakter uzunluğunda olmalıdır.");
             return false;
         }
 
-        // 3. Yükleniyor Durumu (Spam Tıklamayı Önler)
         submitBtn.disabled = true;
         btnText.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> İşleniyor...';
         
-        return true; // Formu gönder
+        return true; 
     }
 
     function showError(message) {
         errorMsg.innerText = message;
         errorBox.style.display = 'block';
+        document.getElementById('successBox').style.display = 'none'; 
     }
 
-    // URL'den Supabase Hata Mesajı Gelirse
     const urlParams = new URLSearchParams(window.location.search);
+    
     if (urlParams.has('error')) {
-        let msg = urlParams.get('error');
-        // Supabase İngilizce mesajlarını Türkçe yapalım
-        if (msg.includes("Invalid login credentials")) msg = "E-posta veya şifre hatalı.";
-        if (msg.includes("User already registered")) msg = "Bu e-posta adresi zaten kullanımda.";
-        showError(msg);
+        let errorTxt = urlParams.get('error');
+        if (errorTxt.includes("Invalid login credentials")) errorTxt = "E-posta veya şifre hatalı.";
+        if (errorTxt.includes("User already registered")) errorTxt = "Bu e-posta adresi zaten kullanımda.";
+        showError(errorTxt);
+    }
+
+    if (urlParams.has('msg')) {
+        document.getElementById('successMsg').innerText = urlParams.get('msg');
+        document.getElementById('successBox').style.display = 'block';
     }
 </script>
 </body>
