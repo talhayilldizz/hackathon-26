@@ -40,3 +40,9 @@ venv.bak/
 
 # Project Specific
 *.log
+
+# macOS Special
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
