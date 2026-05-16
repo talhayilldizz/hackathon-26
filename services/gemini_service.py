@@ -26,7 +26,7 @@ class GeminiService:
         1. Ürünün kalitesini ve risklerini model skoruna göre yorumla.
         2. Kullanıcının mevcut harcama alışkanlıklarına ve aboneliklerine göre bu harcamanın bütçeye etkisini değerlendir.
         3. Eğer bütçeye uymuyorsa veya ürün riskliyse, 'Sonraki Aylara Planla' tavsiyesi ver.
-        4. Samimi ama profesyonel bir mühendis dili kullan.
+        4. Samimi ama profesyonel bir analizci dili kullan.
         
         NOT:"Profiline baktığımda" gibi 
         doğrudan veri kaynağını belirten ifadeler ASLA kullanma. Tavsiyeyi doğal bir akışla ver.

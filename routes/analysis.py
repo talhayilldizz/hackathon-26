@@ -74,9 +74,7 @@ def analiz_yap():
             finansal_baglam
         )
 
-        gemini_yanit = gemini_yanit.replace("###", "") # Başlık simgelerini kaldır
-        gemini_yanit = gemini_yanit.replace("**", "")  # Kalın yazı simgelerini kaldır
-        gemini_yanit = gemini_yanit.replace("*", "")   # Liste/Yıldız simgelerini kaldır
+        
         gemini_yanit = gemini_yanit.strip()
 
         data = {
