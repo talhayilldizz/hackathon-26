@@ -97,6 +97,25 @@ class TrendyolBot:
         
         return tum_yorumlar
 
+    def alternatif_urunleri_cek(self, content_id):
+        """Requests kullanarak verilen urune ait alternatif/benzer urun ID'lerini ceker."""
+        # Belirttigin parametre yapısına uygun dinamik sorgu URL'si
+        api_url = f"https://apigw.trendyol.com/discovery-storefront-trproductgw-service/api/reco-products/{content_id}?page=0&size=8&stampType=TypeA&sizeVariantAttributeValue=&isDynamicRendering=false&culture=tr-TR&recoType=similar&channelId=1"
+        
+        try:
+            cevap = requests.get(api_url, headers=self.headers, timeout=10)
+            if cevap.status_code == 200:
+                veri = cevap.json().get("result", {})
+                products = veri.get("products", [])
+                
+                # Sadece ürün ID'lerini string tipinde bir listede topluyoruz
+                alternatif_idler = [str(urun.get("id")) for urun in products if urun.get("id")]
+                return alternatif_idler
+        except Exception as e:
+            print(f"Alternatif urun API hatasi: {e}")
+            
+        return []
+
     async def analiz_et(self, urun_url):
         """Botun ana calistirma fonksiyonu. Tum verileri birlestirip dict doner."""
         content_id = self.linkten_id_al(urun_url)
@@ -109,15 +128,17 @@ class TrendyolBot:
         # 2. Adim: Yorumlari API'den getir
         yorumlar = self.yorumlari_cek(content_id)
         
+        # Yeni Adim: Alternatif/Benzer urunlerin ID listesini API'den getir
+        alternatifler = self.alternatif_urunleri_cek(content_id)
+        
         # 3. Adim: Sonuclari sozluk (dict) yapisinda birlestir
         sonuc_sozlugu = {
             "content_id": content_id,
             "urun_bilgisi": detaylar,
             "yorumlar": yorumlar,
             "toplam_yorum_sayisi": len(yorumlar),
+            "alternatif_urunler": alternatifler, # Yeni eklenen ID listesi
             "islem_zamani": time.strftime("%Y-%m-%d %H:%M:%S")
         }
         
         return sonuc_sozlugu
-
-
