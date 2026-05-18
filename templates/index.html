@@ -280,7 +280,6 @@
                                 <div class="col-md-12"><label class="form-label">E-POSTA</label><input type="email" name="email" class="form-control" readonly value="{{ profil.email }}"></div>
                                 <div class="col-md-4"><label class="form-label text-success">GELİR</label><input type="number" name="gelir" class="form-control border-success border-opacity-25" value="{{ profil.gelir }}"></div>
                                 <div class="col-md-4"><label class="form-label text-danger">GİDER</label><input type="number" name="gider" class="form-control border-danger border-opacity-25" value="{{ profil.gider }}"></div>
-                                <div class="col-md-4"><label class="form-label text-info">HEDEF</label><input type="number" name="hedef" class="form-control border-info border-opacity-25" value="{{ profil.hedef }}"></div>
                                 <div class="col-md-12 mt-4"><button type="submit" id="profileSaveBtn" class="btn btn-secondary brand-text w-100 py-2 fw-bold rounded-4 shadow-sm opacity-75">Manuel Bilgileri Kaydet</button></div>
                             </div>
                         </form>
@@ -526,6 +525,7 @@
                 const data = await response.json();
 
                 if (data.toplam_gelir !== undefined || data.toplam_gider !== undefined) {
+                    if(data.toplam_gelir) document.querySelector('input[name="gelir"]').value = data.toplam_gelir;
                     if(data.toplam_gider) document.querySelector('input[name="gider"]').value = data.toplam_gider;
                     showToast("AI ekstreni okudu ve bütçeni güncelledi!", "bg-success", "bi-magic");
                 }

@@ -152,4 +152,4 @@ class TrendyolBot:
     
 
 bot = TrendyolBot()
-print(bot.alternatif_urunleri_cek(974364895))
+# print(len(bot.alternatif_urunleri_cek(974364895)))

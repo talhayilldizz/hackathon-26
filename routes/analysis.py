@@ -65,12 +65,14 @@ def analiz_yap():
         model_analiz = model_s.toplu_analiz(bot_verisi["yorumlar"])
         profil_resp = supabase.table("profiles").select("*").eq("id", current_user_id).limit(1).execute()
         profil_data = profil_resp.data[0] if profil_resp.data else {}
+        alternatifler = bot_verisi["alternatif_urunler"]
 
-        finansal_baglam = f"Gelir: {profil_data.get('gelir', 0)} TL, Gider: {profil_data.get('gider', 0)} TL, Hedef: {profil_data.get('hedef', 0)} TL"
+        finansal_baglam = f"Gelir: {profil_data.get('gelir', 0)} TL, Gider: {profil_data.get('gider', 0)} TL."
 
         gemini_yanit = gemini_s.finansal_danismanlik_yap(
             bot_verisi["urun_bilgisi"],
             model_analiz,
+            alternatifler,
             finansal_baglam
         )
 

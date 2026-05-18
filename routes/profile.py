@@ -19,9 +19,9 @@ def profil_guncelle():
         # Form verilerini alırken hata payını sıfırlıyoruz
         gelir = int(request.form.get("gelir") or 0)
         gider = int(request.form.get("gider") or 0)
-        hedef = int(request.form.get("hedef") or 0)
+        # hedef = int(request.form.get("hedef") or 0)
     except (ValueError, TypeError):
-        gelir, gider, hedef = 0, 0, 0
+        gelir, gider= 0, 0
 
     data = {
         "id" : session["user"],
@@ -30,7 +30,6 @@ def profil_guncelle():
         "email" : session.get("user_email"),
         "gelir" : gelir,
         "gider" : gider,
-        "hedef" : hedef,
         "updated_at" : "now()"
     }
 
