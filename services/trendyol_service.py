@@ -3,7 +3,6 @@ import requests
 import re
 import time
 from playwright.async_api import async_playwright
-from services.model_service import ModelService
 
 class TrendyolBot:
     def __init__(self):
@@ -109,8 +108,16 @@ class TrendyolBot:
                 products = veri.get("products", [])
                 
                 # Sadece ürün ID'lerini string tipinde bir listede topluyoruz
-                alternatif_idler = [str(urun.get("id")) for urun in products if urun.get("id")]
-                return alternatif_idler
+                alternatif_urunler = {}
+
+                for urun in products:
+                    sozluk = {}
+                    sozluk["name"] = urun.get("name")
+                    sozluk["url"] = "https://www.trendyol.com" + urun.get("url")
+                    sozluk["price"] = urun.get("prices").get("sellingPrice").get("value")
+                    alternatif_urunler[str(urun.get("id"))] = sozluk
+
+                return alternatif_urunler
         except Exception as e:
             print(f"Alternatif urun API hatasi: {e}")
             
@@ -142,3 +149,7 @@ class TrendyolBot:
         }
         
         return sonuc_sozlugu
+    
+
+bot = TrendyolBot()
+print(bot.alternatif_urunleri_cek(974364895))
