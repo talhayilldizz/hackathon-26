@@ -23,7 +23,10 @@
         
         h1, h2, h3, h4, h5, h6, .brand-text { font-family: 'Outfit', sans-serif; letter-spacing: -0.5px; }
         .display-4 { letter-spacing: -1.5px; }
-        
+        .gemini-heading {
+                color: #1443c5; /* açık beyaz-mavi */
+        }
+                    
         .navbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 15px 0; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
         .main-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         
@@ -41,7 +44,11 @@
             line-height: 1.85 !important; 
             color: var(--txt) !important; 
             opacity: 0.9;
-        }     
+        }   
+        .dynamic-text-strong {
+            color: var(--txt) !important;
+            font-weight: 700;
+        }  
         
         .search-box-wrapper { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); transition: all 0.3s ease; }
         .search-box-wrapper:focus-within { border-color: rgba(13, 110, 253, 0.5); box-shadow: 0 0 25px rgba(13, 110, 253, 0.15); background: rgba(255, 255, 255, 0.08); }
@@ -355,14 +362,12 @@
                 // 1. Markdown H3 (### Başlık)
                 if (trimmed.startsWith('### ')) {
                     let text = trimmed.replace(/^### /, '').replace(/\*\*/g, '');
-                    return `<span class="d-block text-primary mt-3 mb-1 fw-bold brand-text" style="font-size: 1.15rem; letter-spacing: -0.3px;">${text}</span>`;
-                }
+                    return `<span class="d-block gemini-heading mt-3 mb-1 fw-bold brand-text" style="font-size: 1.15rem; letter-spacing: -0.3px;">${text}</span>`;                }
                 
                 // 2. Markdown H2 (## Başlık) -> Ana Büyük Başlık
                 if (trimmed.startsWith('## ')) {
                     let text = trimmed.replace(/^## /, '').replace(/\*\*/g, '');
-                    return `<span class="d-block text-primary mt-4 mb-2 fw-bold brand-text" style="font-size: 1.35rem; letter-spacing: -0.5px;">${text}</span>`;
-                }
+                    return `<span class="d-block gemini-heading mt-4 mb-2 fw-bold brand-text" style="font-size: 1.35rem; letter-spacing: -0.5px;">${text}</span>`;                }
                 
                 let processedLine = line;
 
@@ -378,13 +383,21 @@
                 // 4. Karar/Tavsiye rozetleri
                 processedLine = processedLine.replace(/(Tavsiye:|Tavsiyem:|Sonuç:|Karar:|Özet:)/gi, '<span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1 me-2 fs-6 mb-1">$1</span>');
                 
-                // 5. Otomatik Vurgular: SADECE BEYAZ VE KALIN (% ve TL)
-                processedLine = processedLine.replace(/(%[0-9]+(?:[,.][0-9]+)?)/g, '<strong class="text-white fw-bold">$1</strong>');
-                processedLine = processedLine.replace(/([0-9]+(?:[.,][0-9]{3})*(?:,[0-9]{1,2})?\s*TL)/gi, '<strong class="text-white fw-bold">$1</strong>');
 
-                // 6. Markdown Kalın Yazılar (**Kalın**)
-                processedLine = processedLine.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white fw-bold">$1</strong>');
-                
+                // 7. URL'leri tıklanabilir yap
+                processedLine = processedLine.replace(
+                    /(https?:\/\/[^\s<>"')\]]+)/g,
+                    (url) => {
+                        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary fw-semibold text-decoration-none">${url}</a>`;
+                    }
+                );
+
+                // 5. Otomatik Vurgular: SADECE BEYAZ VE KALIN (% ve TL)
+                processedLine = processedLine.replace(/(%[0-9]+(?:[,.][0-9]+)?)/g, '<strong class="dynamic-text-strong">$1</strong>');
+
+                processedLine = processedLine.replace(/([0-9]+(?:[.,][0-9]{3})*(?:,[0-9]{1,2})?\s*TL)/gi, '<strong class="dynamic-text-strong">$1</strong>');
+
+                processedLine = processedLine.replace(/\*\*(.*?)\*\*/g, '<strong class="dynamic-text-strong">$1</strong>');
                 return processedLine;
             });
             

@@ -33,9 +33,9 @@ def ana_sayfa():
 
     try:
         profil_resp = supabase.table("profiles").select("*").eq("id", current_user_id).limit(1).execute()
-        profil_verisi = profil_resp.data[0] if profil_resp.data else {"isim": "", "soyisim": "", "gelir": 0, "gider": 0, "hedef": 0, "email": session.get('user_email', '')}
+        profil_verisi = profil_resp.data[0] if profil_resp.data else {"isim": "", "soyisim": "", "gelir": 0, "gider": 0, "email": session.get('user_email', '')}
     except:
-        profil_verisi = {"isim": "", "soyisim": "", "gelir": 0, "gider": 0, "hedef": 0, "email": session.get('user_email', '')}
+        profil_verisi = {"isim": "", "soyisim": "", "gelir": 0, "gider": 0, "email": session.get('user_email', '')}
 
     return render_template('index.html', analizler=analizler, profil=profil_verisi)
 
