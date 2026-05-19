@@ -40,6 +40,9 @@ venv.bak/
 
 # Project Specific
 *.log
+all_data/
+data/
+*.csv
 
 # macOS Special
 .DS_Store
