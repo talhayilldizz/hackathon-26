@@ -23,9 +23,7 @@
         
         h1, h2, h3, h4, h5, h6, .brand-text { font-family: 'Outfit', sans-serif; letter-spacing: -0.5px; }
         .display-4 { letter-spacing: -1.5px; }
-        .gemini-heading {
-                color: #1443c5; /* açık beyaz-mavi */
-        }
+        
                     
         .navbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 15px 0; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
         .main-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
@@ -37,14 +35,24 @@
         .form-label { font-weight: 600; font-size: 0.8rem; letter-spacing: 0.5px; color: rgba(255,255,255,0.8); margin-bottom: 8px; text-transform: uppercase; }
         [data-bs-theme="light"] .form-label { color: rgba(0,0,0,0.7); }
         
+        .gemini-heading {
+            color: #3b82f6 !important; /* Canlı Açık Mavi */
+            font-family: 'Outfit', sans-serif;
+        }
+                    
         .gemini-response {
             font-size: 1.05rem !important;
             font-weight: 400 !important; 
             letter-spacing: 0.3px; 
             line-height: 1.85 !important; 
-            color: var(--txt) !important; 
-            opacity: 0.9;
+            /* color: var(--txt) !important; <-- BU SATIRI KALDIRIN VEYA ALTAKİ GİBİ YAPIN */
+            color: rgba(255, 255, 255, 0.9); /* !important olmadan genel metin rengi */
         }   
+
+        /* Açık tema seçildiğinde başlıkların rengini biraz daha koyulaştırıp okunur kılalım */
+        [data-bs-theme="light"] .gemini-heading {
+            color: #1d4ed8 !important; /* Koyu Mavi */
+        }
         .dynamic-text-strong {
             color: var(--txt) !important;
             font-weight: 700;
@@ -362,19 +370,25 @@
                 // 1. Markdown H3 (### Başlık)
                 if (trimmed.startsWith('### ')) {
                     let text = trimmed.replace(/^### /, '').replace(/\*\*/g, '');
-                    return `<span class="d-block gemini-heading mt-3 mb-1 fw-bold brand-text" style="font-size: 1.15rem; letter-spacing: -0.3px;">${text}</span>`;                }
-                
+                    return `<span class="d-block gemini-heading mt-3 mb-1 fw-bold brand-text" style="font-size: 1.15rem; letter-spacing: -0.3px;">${text}</span>`;
+                }
                 // 2. Markdown H2 (## Başlık) -> Ana Büyük Başlık
                 if (trimmed.startsWith('## ')) {
                     let text = trimmed.replace(/^## /, '').replace(/\*\*/g, '');
-                    return `<span class="d-block gemini-heading mt-4 mb-2 fw-bold brand-text" style="font-size: 1.35rem; letter-spacing: -0.5px;">${text}</span>`;                }
-                
+                    return `<span class="d-block gemini-heading mt-4 mb-2 fw-bold brand-text" style="font-size: 1.35rem; letter-spacing: -0.5px;">${text}</span>`;
+                }
                 let processedLine = line;
+
+                if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+                    let text = trimmed.replace(/\*\*/g, '');
+                    return `<span class="d-block gemini-heading mt-3 mb-2 fw-bold brand-text" style="font-size: 1.2rem;">${text}</span>`;
+                }
 
                 // 3. Madde İmleri (* veya - ile başlayanlar) - ÇOK ŞIK TASARIM
                 if (/^[\*\-]\s/.test(trimmed)) {
                     if (trimmed.includes(':')) {
-                        processedLine = trimmed.replace(/^[\*\-]\s+(.*?):(.*)/g, '<div class="d-flex align-items-start mt-2"><i class="bi bi-arrow-right-short text-primary fs-5 me-1" style="margin-top:-2px;"></i><div><strong class="text-white">$1:</strong>$2</div></div>');
+                        // Liste başlıklarını ($1) beyaz yerine mavi yapmak istersen 'text-primary' class'ı ekledim
+                        processedLine = trimmed.replace(/^[\*\-]\s+(.*?):(.*)/g, '<div class="d-flex align-items-start mt-2"><i class="bi bi-arrow-right-short text-primary fs-5 me-1" style="margin-top:-2px;"></i><div><strong class="text-primary">$1:</strong>$2</div></div>');
                     } else {
                         processedLine = trimmed.replace(/^[\*\-]\s+(.*)/g, '<div class="d-flex align-items-start mt-2"><i class="bi bi-check2 text-primary fs-5 me-2" style="margin-top:-2px;"></i><div>$1</div></div>');
                     }
