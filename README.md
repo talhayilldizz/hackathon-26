@@ -1,5 +1,5 @@
 ---
-title: AlinirMi
+title: CartWise
 emoji: 🛍️
 colorFrom: blue
 colorTo: indigo
@@ -9,7 +9,7 @@ pinned: false
 license: mit
 ---
 
-# AlınırMı? - Akıllı Alışveriş ve Finansal Karar Destek Asistanı
+# CartWise - Akıllı Alışveriş ve Finansal Karar Destek Asistanı
 
 Bu proje, Trendyol ürün linklerini analiz ederek kullanıcı yorumlarının duygu analizini kendi eğittiğimiz PyTorch tabanlı bir Yapay Sinir Ağı (ANN) ile yapan ve Gemini API ile kullanıcının bütçesine özel akıllı alışveriş danışmanlığı sunan bir Flask web uygulamasıdır.
 
