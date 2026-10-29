@@ -15,7 +15,6 @@ CartWise, kullanıcıların alışveriş kararlarını ürün yorumları ve kiş
 
 Trendyol ürün bağlantılarından alınan yorumlar, PyTorch ile geliştirilmiş bir duygu analizi modeliyle değerlendirilir. Google Gemini, ürün bilgilerini, analiz sonuçlarını ve kullanıcının sağladığı finansal bağlamı birleştirerek karar destek açıklamaları üretir.
 
-> **Proje durumu:** Yerel model çıkarımı ve Flask'ın temel işlevleri test edilmiştir. Gerçek Supabase, Gemini, Trendyol ve Docker entegrasyonlarının uçtan uca doğrulaması henüz tamamlanmamıştır.
 
 ## Özellikler
 
@@ -159,7 +158,6 @@ docker run --rm -p 7860:7860 \
 
 Uygulama Gunicorn ile `7860` portundan sunulur. Hugging Face Spaces için gerekli Docker metadata bilgileri README dosyasının başında korunmaktadır.
 
-**Not:** Docker yapılandırması güncellenmiştir ancak gerçek Docker build ve container çalışma testi henüz yapılmamıştır. Dağıtım ortamında gerekli servis anahtarlarının güvenli ortam değişkenleri veya secret yönetimi üzerinden sağlanması gerekir.
 
 ## Güvenlik ve veri gizliliği
 
@@ -207,9 +205,6 @@ Yerel geliştirme sırasında şu kontroller gerçekleştirilmiştir:
 | CSRF ve erişim kontrol testleri | Başarılı |
 | PDF yükleme doğrulama testleri | Başarılı |
 | Trendyol URL doğrulama testleri | Başarılı |
-| Gerçek Supabase/Gemini entegrasyonu | Henüz doğrulanmadı |
-| Gerçek Trendyol veri toplama | Henüz doğrulanmadı |
-| Docker container çalıştırma | Henüz doğrulanmadı |
 
 Testlerin bir bölümü dış servisler taklit edilerek (mock) yürütülmüştür. Bunlar gerçek servislerin uçtan uca çalıştığını kanıtlamaz.
 
