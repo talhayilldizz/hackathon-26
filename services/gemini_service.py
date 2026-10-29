@@ -12,7 +12,7 @@ class GeminiService:
         stratejik bir yorum üretir.
         """
         prompt = f"""
-        Sen "AlınırMı?" isimli bir finansal asistan ve akıllı alışveriş danışmanısın.
+        Sen "CartWise" isimli bir finansal asistan ve akıllı alışveriş danışmanısın.
         Amacın, kullanıcıya bir ürünün hem finansal hem de kalite açısından mantıklı bir tercih olup olmadığını anlaşılır şekilde değerlendirmektir.
 
         # ÜRÜN BİLGİLERİ
@@ -54,8 +54,8 @@ class GeminiService:
                 contents=prompt
             )
             return response.text
-        except Exception as e:
-            return f"Danışman şu an meşgul: {str(e)}"
+        except Exception:
+            return "Danışman şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin."
 
     def alternatif_ara(self, urun_adi):
         """Ürünün başka sitelerdeki fiyatlarını bulmak için arama yapar."""

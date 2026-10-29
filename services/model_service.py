@@ -1,11 +1,5 @@
-import os
-# Keras'ın kafası karışmasın, arka planda torch kullanmasını emrediyoruz
-os.environ["KERAS_BACKEND"] = "torch"
-
 import torch
-import pickle
-import numpy as np
-# Talha'nın src içindeki modelini çekiyoruz
+from services.json_tokenizer import JsonTokenizer
 from src.model import SentimentANN
 
 # Sabit Ayarlar
@@ -15,18 +9,17 @@ EMBED_DIM = 128
 HIDDEN_DIM = 64
 
 class ModelService:
-    def __init__(self, model_path='models/sentiment_model.pth', tokenizer_path='models/tokenizer.pickle'):
+    def __init__(self, model_path='models/sentiment_model.pth', tokenizer_path='models/tokenizer.json'):
         # M4 Mac için en hızlısı: mps
         self.device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
         
         try:
-            with open(tokenizer_path, 'rb') as handle:
-                self.tokenizer = pickle.load(handle)
+            self.tokenizer = JsonTokenizer(tokenizer_path)
 
             self.model = SentimentANN(VOCAB_SIZE, EMBED_DIM, HIDDEN_DIM).to(self.device)
-            self.model.load_state_dict(torch.load(model_path, map_location=self.device))
+            self.model.load_state_dict(torch.load(model_path, map_location=self.device, weights_only=True))
             self.model.eval()
-            print(f"✅ AlınırMı? AI Servisi Aktif! Cihaz: {self.device}")
+            print(f"✅ CartWise AI Servisi Aktif! Cihaz: {self.device}")
         except Exception as e:
             print(f"❌ Başlatma Hatası: {e}")
 

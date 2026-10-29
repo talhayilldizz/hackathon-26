@@ -3,7 +3,7 @@ from google.genai import types
 import json
 import re
 
-class InvestWiseNative:
+class BankStatementAnalyzer:
     def __init__(self, api_key):
         self.client = genai.Client(api_key=api_key)
         self.model_id = "gemini-3-flash-preview"
@@ -18,7 +18,7 @@ class InvestWiseNative:
                 return json.loads(json_str)
             return None
         except Exception as e:
-            print(f"JSON Ayrıştırma Hatası: {e}")
+            print("PDF yanıtı ayrıştırılamadı.")
             return None
 
     def analiz_et(self, pdf_yolu):
@@ -49,5 +49,5 @@ class InvestWiseNative:
             return sonuc
 
         except Exception as e:
-            print(f"Hata: {str(e)}")
+            print("PDF analizi başarısız oldu.")
             return None

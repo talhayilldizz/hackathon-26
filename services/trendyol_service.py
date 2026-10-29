@@ -1,6 +1,7 @@
 import asyncio
 import requests
 import re
+from urllib.parse import urlsplit
 import time
 from playwright.async_api import async_playwright
 
@@ -14,18 +15,47 @@ class TrendyolBot:
         self.base_api_url = "https://apigw.trendyol.com/discovery-storefront-trproductgw-service/api/review-read/product-reviews/detailed"
 
     def linkten_id_al(self, url):
-        """URL icerisinden urun ID'sini ayiklar."""
-        try:
-            if "-p-" in url:
-                id_kismi = url.split("-p-")[-1].split("?")[0]
-                return re.sub(r"\D", "", id_kismi)
+        """Yalnizca HTTPS Trendyol urun URL'lerinden ID ayiklar."""
+        if not isinstance(url, str) or len(url) > 2048:
             return None
-        except Exception as e:
-            print(f"ID ayiklama hatasi: {e}")
+
+        if any(ord(char) <= 32 for char in url):
+            return None
+
+        try:
+            parsed = urlsplit(url)
+
+            if parsed.scheme != "https":
+                return None
+
+            if parsed.hostname not in {
+                "trendyol.com",
+                "www.trendyol.com",
+            }:
+                return None
+
+            if (
+                parsed.username is not None
+                or parsed.password is not None
+                or parsed.port is not None
+            ):
+                return None
+
+            match = re.search(
+                r"-p-([0-9]{1,20})/?$",
+                parsed.path
+            )
+
+            return match.group(1) if match else None
+
+        except ValueError:
             return None
 
     async def urun_bilgilerini_kazi(self, urun_url):
         """Playwright kullanarak urun adı, fiyat ve gorsel bilgilerini HTML'den ceker."""
+        if not self.linkten_id_al(urun_url):
+            raise ValueError("Gecersiz Trendyol urun adresi.")
+
         async with async_playwright() as p:
             tarayici = await p.chromium.launch(headless=True)
             baglam = await tarayici.new_context(user_agent=self.headers["User-Agent"])

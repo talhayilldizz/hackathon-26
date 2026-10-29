@@ -1,10 +1,10 @@
-torch
+# Application dependencies
+-r requirements-prod.txt
+
+# Training and notebook dependencies
 torchvision
 torchaudio
 tensorflow
 pandas
-numpy
 scikit-learn
 matplotlib
-pickle5
-flask
