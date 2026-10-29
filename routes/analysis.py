@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify, abort
 from extensions import supabase
+from services.csrf import get_csrf_token, valid_csrf_token
 from services.model_service import ModelService
 from services.trendyol_service import TrendyolBot
 from services.gemini_service import GeminiService
@@ -37,7 +38,7 @@ def ana_sayfa():
     except:
         profil_verisi = {"isim": "", "soyisim": "", "gelir": 0, "gider": 0, "email": session.get('user_email', '')}
 
-    return render_template('index.html', analizler=analizler, profil=profil_verisi)
+    return render_template('index.html', analizler=analizler, profil=profil_verisi, csrf_token=get_csrf_token())
 
 
 
@@ -52,6 +53,9 @@ bot = TrendyolBot()
 def analiz_yap():
     """Yeni bir ürün analizi başlatır ve veritabanına kaydeder."""
     if 'user' not in session: return redirect(url_for('auth.login_page'))
+
+    if not valid_csrf_token(request.form.get('csrf_token')):
+        abort(403)
     
     current_user_id = session.get('user')
     link = request.form.get("urun_linki")
@@ -91,21 +95,23 @@ def analiz_yap():
         }
 
         supabase.table("analizler").insert(data).execute()
-        print(f"✅ Analiz Başarıyla Tamamlandı: {data['baslik']}")
-        print(gemini_yanit)
+        print("Analiz tamamlandı.")
     
     except Exception as e:
-        print("❌ Analiz Hatası:", str(e))
+        print("Analiz hatası:", type(e).__name__)
         
     
     return redirect(url_for('analysis.ana_sayfa'))
 
 
-@analysis_bp.route('/analiz_sil/<id>')
+@analysis_bp.route('/analiz_sil/<id>', methods=['POST'])
 def analiz_sil(id): 
     """Belirli bir analizi veritabanından siler."""
     if 'user' not in session: 
         return redirect(url_for('auth.login_page'))
+
+    if not valid_csrf_token(request.form.get('csrf_token')):
+        abort(403)
         
     try:
         # Supabase'den silme işlemi
@@ -119,6 +125,9 @@ def analiz_sil(id):
 @analysis_bp.route('/api/favori_toggle/<id>/<status>', methods=['POST'])
 def api_favori_toggle(id, status):
     if 'user' not in session: return jsonify({"error": "Unauthorized"}), 401
+
+    if not valid_csrf_token(request.headers.get("X-CSRF-Token")):
+        abort(403)
     new_status = True if status == 'true' else False
     try:
         supabase.table("analizler").update({"is_favorite": new_status}).eq("id", id).eq("user_id", session['user']).execute()

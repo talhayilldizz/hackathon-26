@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.12-slim-bookworm
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -35,8 +35,7 @@ COPY requirements-prod.txt .
 RUN pip install --no-cache-dir -r requirements-prod.txt
 
 # Install Playwright and chromium browser
-RUN playwright install chromium
-RUN playwright install-deps chromium
+RUN playwright install --with-deps chromium
 
 # Copy project files
 COPY . .

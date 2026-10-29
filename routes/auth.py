@@ -1,6 +1,7 @@
 from flask import Blueprint, request, redirect, url_for, session, render_template
-import urllib.parse
 from extensions import supabase
+from flask import abort
+from services.csrf import get_csrf_token, valid_csrf_token
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -9,10 +10,13 @@ def login_page():
     """Giriş sayfasını görüntüler."""
     if 'user' in session: 
         return redirect(url_for('analysis.ana_sayfa'))
-    return render_template('login.html')
+    return render_template('login.html', csrf_token=get_csrf_token())
 
 @auth_bp.route('/auth', methods=["POST"])
 def auth_process():
+    if not valid_csrf_token(request.form.get('csrf_token')):
+        abort(403)
+
     email = request.form.get('email')
     pw = request.form.get('password')
     action = request.form.get('action')
@@ -30,11 +34,20 @@ def auth_process():
             session['user_email'] = res.user.email
             return redirect(url_for('analysis.ana_sayfa'))
             
-    except Exception as e:
-        return redirect(f"/login?error={urllib.parse.quote(str(e))}")
+    except Exception:
+        return redirect(url_for(
+            "auth.login_page",
+            error="Giriş veya kayıt işlemi tamamlanamadı."
+        ))
     
 
-@auth_bp.route('/logout')
+@auth_bp.route('/logout', methods=['POST'])
 def logout():
+    if 'user' not in session:
+        return redirect(url_for('auth.login_page'))
+
+    if not valid_csrf_token(request.form.get('csrf_token')):
+        abort(403)
+
     session.clear()
     return redirect(url_for('auth.login_page'))   

@@ -49,3 +49,9 @@ data/
 .AppleDouble
 .LSOverride
 ._*
+
+# Legacy tokenizer (JSON is used for inference)
+/models/tokenizer.pickle
+
+# Legacy application logo
+/static/logo.png

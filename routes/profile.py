@@ -1,19 +1,24 @@
-from flask import Blueprint, request, redirect, url_for, session, jsonify
+from flask import Blueprint, request, redirect, url_for, session, jsonify, abort
 from extensions import supabase
-from services.pdf_service import InvestWiseNative
+from services.pdf_service import BankStatementAnalyzer
+from services.csrf import valid_csrf_token
 from dotenv import load_dotenv
 import os
+from tempfile import NamedTemporaryFile
 
 
 profile_bp = Blueprint('profile', __name__)
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
-AI_MOTOR = InvestWiseNative(api_key)
+statement_analyzer = BankStatementAnalyzer(api_key)
 
 @profile_bp.route('/profil_guncelle', methods=['POST'])
 def profil_guncelle():
     if "user" not in session:
-        return redirect(url_for("auth.login_page")) 
+        return redirect(url_for("auth.login_page"))
+
+    if not valid_csrf_token(request.form.get("csrf_token")):
+        abort(403)
 
     try:
         # Form verilerini alırken hata payını sıfırlıyoruz
@@ -37,35 +42,61 @@ def profil_guncelle():
         supabase.table("profiles").upsert(data, on_conflict="id").execute()
         return redirect("/#profile") 
     except Exception as e:
-        print("Profil Güncelleme Hatası:", str(e))
+        print("Profil güncelleme hatası:", type(e).__name__)
         return redirect(url_for('analysis.ana_sayfa'))
+
+MAX_PDF_BYTES = 10 * 1024 * 1024
+
 
 @profile_bp.route('/profil/pdf_yukle', methods=['POST'])
 def pdf_yukle():
     if "user" not in session:
         return jsonify({"error": "Oturum açmanız gerekiyor"}), 401
-    
-    if 'ekstre_pdf' not in request.files:
+
+    if not valid_csrf_token(request.form.get("csrf_token")):
+        abort(403)
+
+    if "ekstre_pdf" not in request.files:
         return jsonify({"error": "Dosya seçilmedi"}), 400
-    
-    file = request.files['ekstre_pdf']
-    if file.filename == '':
+
+    uploaded = request.files["ekstre_pdf"]
+
+    if not uploaded.filename:
         return jsonify({"error": "Dosya adı boş"}), 400
 
-    try:
-        temp_path = f"temp_{session['user']}.pdf"
-        file.save(temp_path)
-        sonuc = AI_MOTOR.analiz_et(temp_path)
-    
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
-        
-        if sonuc:
-            print(sonuc)
-            return jsonify(sonuc), 200
-        
-        return jsonify({"error": "AI verileri okuyamadı"}), 500
+    if not uploaded.filename.lower().endswith(".pdf"):
+        return jsonify({"error": "Yalnızca PDF yüklenebilir"}), 415
 
-    except Exception as e:
-        print("PDF İşleme Hatası:", str(e))
-        return jsonify({"error": f"Sunucu hatası: {str(e)}"}), 500
+    content = uploaded.stream.read(MAX_PDF_BYTES + 1)
+
+    if len(content) > MAX_PDF_BYTES:
+        return jsonify({"error": "PDF boyutu 10 MB sınırını aşıyor"}), 413
+
+    if not content.startswith(b"%PDF-"):
+        return jsonify({"error": "Geçersiz PDF dosyası"}), 415
+
+    temp_path = None
+
+    try:
+        with NamedTemporaryFile(
+            mode="wb",
+            suffix=".pdf",
+            prefix="cartwise-",
+            delete=False,
+        ) as temp_file:
+            temp_path = temp_file.name
+            temp_file.write(content)
+
+        sonuc = statement_analyzer.analiz_et(temp_path)
+
+        if not sonuc:
+            return jsonify({"error": "PDF analiz edilemedi"}), 500
+
+        return jsonify(sonuc), 200
+
+    except Exception:
+        return jsonify({"error": "PDF işlenirken hata oluştu"}), 500
+
+    finally:
+        if temp_path and os.path.exists(temp_path):
+            os.remove(temp_path)
